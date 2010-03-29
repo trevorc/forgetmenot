@@ -14,8 +14,8 @@ def decode(s):
 
 def ask(question, strict):
     prompt = '%s = ' % encode(question.prompt)
-    response = raw_input(prompt)
-    response = decode(response.strip().lower())
+    response = decode(raw_input(prompt))
+    response = response.strip().lower()
     answer_set = set(map(string.lower, question.answers))
 
     if strict:
