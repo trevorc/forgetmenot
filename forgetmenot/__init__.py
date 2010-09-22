@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from optparse import OptionParser
+import sys
 
 from forgetmenot.quiz import load_quiz
 
@@ -29,23 +30,29 @@ def get_options():
 
     return options, args
 
+def run_text_quiz(quiz, options):
+    import forgetmenot.text
+    forgetmenot.text.run_quiz(quiz, options.strict)
+
+def run_gui_quiz(quiz, options):
+    try:
+        import forgetmenot.gui
+        forgetmenot.gui.run_quiz(quiz, options.font_size)
+    except ImportError, e:
+        if 'gtk' in e.args[0]:
+            sys.stderr.write('error: pygtk not found. Install pygtk '
+                             'or rerun with --text-mode.\n')
+    except KeyboardInterrupt:
+        pass
+
 def main():
     options, args = get_options()
     quiz = load_quiz(args[0], options.reverse)
 
     if options.text:
-        import forgetmenot.text
-        run_quiz = forgetmenot.text.run_quiz
-        args = [options.strict]
+        run_text_quiz(quiz, options)
     else:
-        import forgetmenot.gui
-        run_quiz = forgetmenot.gui.run_quiz
-        args = [options.font_size]
-
-    try:
-        run_quiz(quiz, *args)
-    except KeyboardInterrupt:
-        pass
+        run_gui_quiz(quiz, options)
 
 if __name__ == '__main__':
     main()
